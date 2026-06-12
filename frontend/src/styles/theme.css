@@ -21,51 +21,6 @@
   --transition-speed: 0.2s;
 }
 
-/* ─── Dark mode ────────────────────────────────────────────────────────
-   All dark colors maintain WCAG AA contrast (>= 4.5:1 for body text,
-   >= 3:1 for large text and UI components). Tested with WebAIM checker. */
-@media (prefers-color-scheme: dark) {
-  :root {
-    --bg: #0f1714; /* base background */
-    --surface: #1a2620; /* card/panel surfaces — 14:1 vs text */
-    --text: #e2ebe6; /* ~13:1 on surface */
-    --muted: #9db0a6; /* ~5.5:1 on surface */
-    --primary: #3cc98a; /* ~5.8:1 on surface */
-    --primary-dark: #2aaa71;
-    --primary-light: #1e3d2e;
-    --accent: #f0965a; /* ~5.1:1 on surface */
-    --border: #2e4038;
-    --focus: #6ba3ff; /* ~4.6:1 on surface */
-    --input-bg: #14201b; /* darker than surface */
-    --shadow: 0 1px 4px rgba(0, 0, 0, 0.5);
-  }
-
-  /* Note: input/select colors are handled by the var(--input-bg) variable
-     to avoid CSS cascade order issues with the base rules. */
-
-  fieldset {
-    border-color: var(--border);
-  }
-
-  .recommendation {
-    background: var(--primary-light);
-  }
-
-  .bar-track {
-    background: #1e2e27;
-  }
-
-  .badge {
-    background: var(--primary-light);
-    color: var(--primary);
-  }
-
-  .btn.secondary {
-    background: var(--surface);
-    color: var(--primary);
-    border-color: var(--primary);
-  }
-}
 
 * {
   box-sizing: border-box;
@@ -324,5 +279,55 @@ table.history tbody tr:hover {
   * {
     transition: none !important;
     animation: none !important;
+  }
+}
+
+/* ─── Dark mode ────────────────────────────────────────────────────────
+   All dark colors maintain WCAG AA contrast (>= 4.5:1 for body text,
+   >= 3:1 for large text and UI components). Tested with WebAIM checker. */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #0f1714; /* base background */
+    --surface: #1a2620; /* card/panel surfaces — 14:1 vs text */
+    --text: #e2ebe6; /* ~13:1 on surface */
+    --muted: #9db0a6; /* ~5.5:1 on surface */
+    --primary: #3cc98a; /* ~5.8:1 on surface */
+    --primary-dark: #2aaa71;
+    --primary-light: #1e3d2e;
+    --accent: #f0965a; /* ~5.1:1 on surface */
+    --border: #2e4038;
+    --focus: #6ba3ff; /* ~4.6:1 on surface */
+    --input-bg: #14201b; /* darker than surface */
+    --shadow: 0 1px 4px rgba(0, 0, 0, 0.5);
+  }
+
+  /* Note: input/select colors are handled by the var(--input-bg) variable
+     to avoid CSS cascade order issues with the base rules. */
+
+  fieldset {
+    border-color: var(--border);
+  }
+
+  .recommendation {
+    background: var(--primary-light);
+  }
+
+  .bar-track {
+    background: #1e2e27;
+  }
+
+  .badge {
+    background: var(--primary-light);
+    color: var(--primary);
+  }
+
+  .btn.secondary {
+    background: var(--surface);
+    color: var(--primary);
+    border-color: var(--primary);
+  }
+
+  .recommendation .saving {
+    color: var(--primary);
   }
 }
