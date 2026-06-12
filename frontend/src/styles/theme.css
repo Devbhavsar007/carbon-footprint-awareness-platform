@@ -15,6 +15,7 @@
   --accent: #b3541e; /* warning/over-target, ~4.6:1 on white */
   --border: #c9d3ce;
   --focus: #1558d6;
+  --input-bg: #fff;
   --radius: 10px;
   --shadow: 0 1px 3px rgba(0, 0, 0, 0.12);
   --transition-speed: 0.2s;
@@ -35,15 +36,12 @@
     --accent: #f0965a; /* ~5.1:1 on surface */
     --border: #2e4038;
     --focus: #6ba3ff; /* ~4.6:1 on surface */
+    --input-bg: #14201b; /* darker than surface */
     --shadow: 0 1px 4px rgba(0, 0, 0, 0.5);
   }
 
-  input,
-  select {
-    background: #14201b;
-    color: var(--text);
-    border-color: var(--border);
-  }
+  /* Note: input/select colors are handled by the var(--input-bg) variable
+     to avoid CSS cascade order issues with the base rules. */
 
   fieldset {
     border-color: var(--border);
@@ -163,7 +161,7 @@ select {
   padding: 0.5rem 0.6rem;
   border: 1px solid var(--border);
   border-radius: 8px;
-  background: #fff;
+  background: var(--input-bg);
   color: var(--text);
   transition: background-color var(--transition-speed) ease,
     border-color var(--transition-speed) ease;
