@@ -7,6 +7,7 @@ def test_health(client):
     resp = client.get("/api/health")
     assert resp.status_code == 200
     assert resp.json()["status"] == "ok"
+    assert resp.json()["version"] == "1.4.0"
 
 
 def test_calculate_returns_breakdown(client):

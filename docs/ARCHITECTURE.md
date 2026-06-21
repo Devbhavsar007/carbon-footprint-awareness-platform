@@ -58,3 +58,7 @@ by construction.
 Every push runs lint (ruff, ESLint + jsx-a11y), formatting (ruff format,
 Prettier), strict type checks (mypy, tsc), and both test suites with enforced
 coverage thresholds — see [CONTRIBUTING.md](../CONTRIBUTING.md).
+
+## Known limitations
+
+- **Single-Instance Assumption:** The application uses process-local state for rate limiting (`slowapi.Limiter` in `rate_limit.py`) and insight caching (`cachetools.TTLCache` in `gemini.py`). These components assume a single-instance deployment model. To ensure globally accurate rate limits and cache deduplication, the deployment target (e.g., Cloud Run) must be constrained to a single instance (e.g., `max-instances=1`). Scaling beyond one instance will result in independent, per-process state.

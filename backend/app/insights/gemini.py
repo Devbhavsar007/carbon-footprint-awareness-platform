@@ -50,7 +50,9 @@ _MAX_SUMMARY_LENGTH = 1000
 _PROMPTS_DIR = Path(__file__).resolve().parent / "prompts"
 
 # TTL cache for insights responses — avoids duplicate Gemini calls when a user
-# re-submits identical data within 60 seconds.  Thread-safe via a lock.
+# re-submits identical data within 60 seconds. In-memory deduplication cache.
+# NOTE: This is process-local state. See "Known limitations" in docs/ARCHITECTURE.md
+# regarding the single-instance deployment assumption.
 _INSIGHTS_CACHE: TTLCache[str, InsightsResponse] = TTLCache(maxsize=256, ttl=60)
 _CACHE_LOCK = asyncio.Lock()
 

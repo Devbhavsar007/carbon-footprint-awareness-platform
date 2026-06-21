@@ -11,4 +11,6 @@ from slowapi.util import get_remote_address
 
 # Rate limiter - keyed by client IP. Used to protect the Vertex AI-backed
 # /api/insights endpoint from quota exhaustion and billing abuse.
+# NOTE: This is process-local state. See "Known limitations" in docs/ARCHITECTURE.md
+# regarding the single-instance deployment assumption.
 limiter = Limiter(key_func=get_remote_address)

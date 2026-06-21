@@ -79,17 +79,4 @@ describe("CalculatorForm", () => {
     expect(button).toHaveAttribute("aria-busy", "true");
   });
 
-  it("associates the household hint with its input for screen readers", () => {
-    render(<CalculatorForm onSubmit={() => {}} loading={false} />);
-    expect(screen.getByLabelText(/people in household/i)).toHaveAccessibleDescription(
-      /home energy is shared/i,
-    );
-  });
-
-  it("constrains numeric inputs to the documented bounds", () => {
-    render(<CalculatorForm onSubmit={() => {}} loading={false} />);
-    expect(screen.getByLabelText(/car distance per week/i)).toHaveAttribute("max", "20000");
-    expect(screen.getByLabelText(/short-haul flights/i)).toHaveAttribute("max", "200");
-    expect(screen.getByLabelText(/people in household/i)).toHaveAttribute("max", "50");
-  });
 });

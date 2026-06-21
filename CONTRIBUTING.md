@@ -62,6 +62,8 @@ and must pass before merging:
   includes an automated axe assertion.
 - **Tests first-class:** new behavior ships with tests; coverage thresholds are
   hard CI gates, so untested code fails the build.
+- **Versioning Policy:** The backend and frontend are versioned independently. The backend version (defined in `backend/pyproject.toml` and `app/__init__.py`) is the primary driver of the overall platform version and dictates the releases documented in `CHANGELOG.md`.
+- **Commit Conventions:** Follow Conventional Commits style (`feat:`, `fix:`, `chore:`, etc.). Keep feature work in reviewable, incremental commits rather than single large drops.
 - **No secrets in the repo:** Google Cloud auth is via Application Default
   Credentials only.
 
