@@ -3,7 +3,7 @@
 # Pinned >=9.0.3 to avoid CVE-2025-71176 (insecure /tmp/pytest-of-{user}
 # directory handling on UNIX, local DoS / privilege-escalation risk).
 pytest==8.3.4
-pytest-cov==6.0.0
+pytest-cov==7.1.0
 pytest-asyncio==0.24.0
 httpx==0.28.1
 ruff==0.8.6
