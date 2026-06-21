@@ -32,7 +32,7 @@ import logging
 import time
 from functools import lru_cache
 from pathlib import Path
-from typing import Any, cast
+from typing import TYPE_CHECKING, Any, cast
 
 import yaml
 from cachetools import TTLCache
@@ -40,6 +40,12 @@ from cachetools import TTLCache
 from app.config import Settings
 from app.insights.rules import generate_rule_based_insights
 from app.models import CarbonInput, FootprintResult, InsightsResponse, Recommendation
+
+if TYPE_CHECKING:
+    # Only needed for the type checker — the real import stays lazy at runtime
+    # (see _get_gemini_client) so the SDK/credentials aren't required for tests
+    # or the rule-based path.
+    from google.genai import Client
 
 logger = logging.getLogger(__name__)
 
@@ -155,11 +161,14 @@ def _validate_gemini_response(payload: dict[str, Any], total_annual_kg: float) -
 
 
 @lru_cache
-def _get_gemini_client(project_id: str, region: str) -> Any:  # noqa: ANN401
+def _get_gemini_client(project_id: str, region: str) -> Client:
     """Return a cached Gemini client (avoids re-initializing credentials per call).
 
     Imported lazily so the SDK/credentials are only required when actually used —
-    keeps unit tests and the rule-based path dependency-free.
+    keeps unit tests and the rule-based path dependency-free. The return type is
+    real (not `Any`): `google-genai` ships no `py.typed` marker, so mypy treats
+    it as an untyped import under the existing per-module override rather than
+    raising an error, while readers and IDEs still get the actual type name.
     """
     from google import genai
 

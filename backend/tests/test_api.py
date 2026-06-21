@@ -74,4 +74,8 @@ def test_security_headers_present(client):
     resp = client.get("/api/health")
     assert resp.headers["X-Content-Type-Options"] == "nosniff"
     assert resp.headers["X-Frame-Options"] == "DENY"
-    assert "Content-Security-Policy" in resp.headers
+    assert resp.headers["Strict-Transport-Security"] == "max-age=63072000; includeSubDomains"
+    assert resp.headers["Cross-Origin-Opener-Policy"] == "same-origin"
+    csp = resp.headers["Content-Security-Policy"]
+    assert "style-src 'self'" in csp
+    assert "unsafe-inline" not in csp

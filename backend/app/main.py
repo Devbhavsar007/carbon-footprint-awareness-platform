@@ -39,8 +39,14 @@ _SECURITY_HEADERS = {
     "X-Frame-Options": "DENY",
     "Referrer-Policy": "no-referrer",
     "Permissions-Policy": "geolocation=(), microphone=(), camera=()",
+    # Cloud Run terminates TLS in front of this container, so HSTS is safe to
+    # set unconditionally here — the app never legitimately serves plain HTTP.
+    "Strict-Transport-Security": "max-age=63072000; includeSubDomains",
+    # Isolates this origin's window/tab from cross-origin popups/openers
+    # (mitigates cross-window attacks such as tabnabbing and Spectre-style leaks).
+    "Cross-Origin-Opener-Policy": "same-origin",
     "Content-Security-Policy": (
-        "default-src 'self'; img-src 'self' data:; style-src 'self' 'unsafe-inline'; "
+        "default-src 'self'; img-src 'self' data:; style-src 'self'; "
         "script-src 'self'; connect-src 'self'; base-uri 'self'; frame-ancestors 'none'"
     ),
 }

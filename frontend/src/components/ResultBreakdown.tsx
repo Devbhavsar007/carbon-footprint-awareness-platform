@@ -49,7 +49,15 @@ export function ResultBreakdown({ result }: Props) {
           >
             <span>{categoryLabel(key)}</span>
             <span className="bar-track" aria-hidden="true">
-              <span className="bar-fill" style={{ width: `${(value / max) * 100}%` }} />
+              <svg
+                className="bar-fill-svg"
+                viewBox="0 0 100 100"
+                preserveAspectRatio="none"
+                width="100%"
+                height="100%"
+              >
+                <rect className="bar-fill" x="0" y="0" width={(value / max) * 100} height="100" />
+              </svg>
             </span>
             <span>{formatKg(value)}</span>
           </div>
