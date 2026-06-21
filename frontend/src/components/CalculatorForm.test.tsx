@@ -78,5 +78,4 @@ describe("CalculatorForm", () => {
     expect(button).toBeDisabled();
     expect(button).toHaveAttribute("aria-busy", "true");
   });
-
 });

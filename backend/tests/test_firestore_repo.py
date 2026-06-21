@@ -128,3 +128,19 @@ def test_listing_respects_limit(repo):
     for _ in range(4):
         _add(repo, "device-fire-0004")
     assert len(repo.list_for_device("device-fire-0004", limit=2)) == 2
+
+
+@pytest.mark.asyncio
+async def test_async_add_and_list_for_device(repo):
+    data = CarbonInput()
+    result = calculate_footprint(data)
+
+    # Test async_add
+    entry = await repo.async_add("device-fire-async", data, result)
+    assert entry.id
+    assert entry.device_id == "device-fire-async"
+
+    # Test async_list_for_device
+    entries = await repo.async_list_for_device("device-fire-async")
+    assert len(entries) == 1
+    assert entries[0].id == entry.id

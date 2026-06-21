@@ -67,6 +67,12 @@ describe("HistoryPanel", () => {
     expect(screen.getByText(/no change since your last entry/i)).toBeInTheDocument();
   });
 
+  it("does not render a trend with exactly one entry", () => {
+    const entries = [makeEntry("e1", "2026-01-01T10:00:00Z", 5.0)];
+    render(<HistoryPanel entries={entries} />);
+    expect(screen.queryByText(/since your last entry/i)).not.toBeInTheDocument();
+  });
+
   it("renders one table row per saved entry", () => {
     const entries = [
       makeEntry("e3", "2026-03-01T10:00:00Z", 4.0),

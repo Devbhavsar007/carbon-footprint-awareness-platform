@@ -34,10 +34,10 @@ export default defineConfig({
       ],
       // Hard gates: CI fails if coverage regresses below these thresholds.
       thresholds: {
-        statements: 90,
-        branches: 85,
-        functions: 90,
-        lines: 90,
+        statements: 100,
+        branches: 100,
+        functions: 100,
+        lines: 100,
       },
     },
   },

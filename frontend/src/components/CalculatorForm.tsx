@@ -18,14 +18,14 @@ const DIET_OPTIONS: { value: DietType; label: string }[] = [
   { value: "vegan", label: "Vegan" },
 ];
 
-
 /** Accessible footprint input form: labelled controls grouped in fieldsets. */
 export function CalculatorForm({ onSubmit, loading }: Props) {
   const [input, setInput] = useState<CarbonInput>(emptyInput);
 
   // Type-safe section updaters
-  const patchSection = <K extends keyof CarbonInput>(section: K, patch: Partial<CarbonInput[K]>) => {
-    setInput((p) => ({ ...p, [section]: typeof p[section] === "object" ? { ...p[section], ...patch } : patch }));
+  type SectionKey = "transport" | "home" | "consumption";
+  const patchSection = <K extends SectionKey>(section: K, patch: Partial<CarbonInput[K]>) => {
+    setInput((p) => ({ ...p, [section]: { ...p[section], ...patch } }));
   };
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -37,7 +37,10 @@ export function CalculatorForm({ onSubmit, loading }: Props) {
     <form className="card" onSubmit={handleSubmit} aria-labelledby="calc-heading">
       <h2 id="calc-heading">Estimate your annual footprint</h2>
 
-      <TransportSection input={input.transport} onChange={(patch) => patchSection("transport", patch)} />
+      <TransportSection
+        input={input.transport}
+        onChange={(patch) => patchSection("transport", patch)}
+      />
       <HomeSection input={input.home} onChange={(patch) => patchSection("home", patch)} />
 
       <fieldset>
@@ -56,7 +59,10 @@ export function CalculatorForm({ onSubmit, loading }: Props) {
             ))}
           </select>
         </div>
-        <ConsumptionSection input={input.consumption} onChange={(patch) => patchSection("consumption", patch)} />
+        <ConsumptionSection
+          input={input.consumption}
+          onChange={(patch) => patchSection("consumption", patch)}
+        />
       </fieldset>
 
       <button className="btn" type="submit" disabled={loading} aria-busy={loading}>

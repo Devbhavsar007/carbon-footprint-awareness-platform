@@ -11,6 +11,11 @@ interface NumberFieldProps {
   hint?: string;
 }
 
+export function coerceNumber(raw: string): number {
+  const n = Number(raw);
+  return Number.isNaN(n) ? 0 : n;
+}
+
 /**
  * A labelled numeric input with consistent accessibility wiring: explicit
  * label association, optional hint exposed through `aria-describedby`, and
@@ -41,8 +46,7 @@ export function NumberField({
         aria-describedby={hintId}
         value={value}
         onChange={(e) => {
-          const next = Number(e.target.value);
-          onChange(Number.isNaN(next) ? 0 : next);
+          onChange(coerceNumber(e.target.value));
         }}
       />
       {hint && (

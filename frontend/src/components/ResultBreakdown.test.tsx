@@ -35,4 +35,18 @@ describe("ResultBreakdown", () => {
     expect(screen.getByRole("table")).toBeInTheDocument();
     expect(screen.getByRole("rowheader", { name: "Diet" })).toBeInTheDocument();
   });
+
+  it("shows the under-target indicator and text when the ratio is <= 1", () => {
+    const underTargetResult: FootprintResult = {
+      ...result,
+      comparison: {
+        ...result.comparison,
+        ratio_to_sustainable_target: 0.8,
+      },
+    };
+    render(<ResultBreakdown result={underTargetResult} />);
+    // "↓ 5.0 t CO₂e"
+    expect(screen.getByText(/↓/)).toBeInTheDocument();
+    expect(screen.getByText(/at or below the sustainable target/i)).toBeInTheDocument();
+  });
 });

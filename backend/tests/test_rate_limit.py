@@ -33,6 +33,30 @@ def test_oversized_body_returns_413(client):
     assert "too large" in resp.json()["detail"].lower()
 
 
+def test_invalid_content_length_returns_400(client):
+    """POST requests with a non-numeric Content-Length are rejected."""
+    resp = client.post(
+        "/api/calculate",
+        json={"diet": "vegan"},
+        headers={"content-length": "not-a-number"},
+    )
+    assert resp.status_code == 400
+    assert "invalid content-length" in resp.json()["detail"].lower()
+
+
+def test_oversized_streaming_body_returns_413(client):
+    """POST requests that omit or understate Content-Length but exceed 64 KB are rejected during streaming."""
+    huge = b'{"diet": "vegan", "extra": "' + b"x" * 70_000 + b'"}'
+    # Provide a false small Content-Length to bypass the first check
+    resp = client.post(
+        "/api/calculate",
+        content=huge,
+        headers={"content-length": "100", "content-type": "application/json"},
+    )
+    assert resp.status_code == 413
+    assert "too large" in resp.json()["detail"].lower()
+
+
 def test_calculate_not_rate_limited(client):
     """The /api/calculate endpoint has no rate limit — it's pure computation."""
     payload = {"diet": "vegan"}

@@ -9,8 +9,7 @@ interface Props {
 
 export function ConsumptionSection({ input, onChange }: Props) {
   return (
-    <fieldset>
-      <legend>Consumption</legend>
+    <>
       <NumberField
         id="goods"
         label="Goods spending per month (USD)"
@@ -25,6 +24,6 @@ export function ConsumptionSection({ input, onChange }: Props) {
         value={input.waste_kg_per_week}
         onChange={(v) => onChange({ waste_kg_per_week: v })}
       />
-    </fieldset>
+    </>
   );
 }

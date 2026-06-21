@@ -2,7 +2,19 @@ import { describe, expect, it, vi } from "vitest";
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { axe } from "vitest-axe";
-import { NumberField } from "./NumberField";
+import { NumberField, coerceNumber } from "./NumberField";
+
+describe("coerceNumber", () => {
+  it("coerces invalid and empty strings to 0", () => {
+    expect(coerceNumber("abc")).toBe(0);
+    expect(coerceNumber("")).toBe(0);
+  });
+
+  it("parses valid numeric strings", () => {
+    expect(coerceNumber("123")).toBe(123);
+    expect(coerceNumber("1.23")).toBe(1.23);
+  });
+});
 
 describe("NumberField", () => {
   it("has no accessibility violations (with and without a hint)", async () => {
