@@ -43,6 +43,9 @@ describe("useFootprint", () => {
   it("does nothing if save is called before calculate", async () => {
     const { result } = renderHook(() => useFootprint());
 
+    // Wait for the mount-time listEntries effect to settle before acting
+    await waitFor(() => expect(api.listEntries).toHaveBeenCalled());
+
     await result.current.save(); // early return branch
 
     expect(api.saveEntry).not.toHaveBeenCalled();
