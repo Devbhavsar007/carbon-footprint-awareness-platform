@@ -6,7 +6,7 @@ requires-python = ">=3.10"
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
-# Coverage is a hard gate: the build fails if it drops below 90%.
+# Coverage is a hard gate: the build fails if it drops below 100%.
 addopts = "-ra -q --cov=app --cov-report=term-missing --cov-fail-under=100"
 pythonpath = ["."]
 asyncio_mode = "auto"

@@ -18,7 +18,7 @@ describe("useFootprint", () => {
   it("fails silently when loadHistory throws", async () => {
     // Suppress console.error in the test output so it doesn't look like a crash
     const consoleSpy = vi.spyOn(console, "error").mockImplementation(() => {});
-    
+
     vi.mocked(api.listEntries).mockRejectedValueOnce(new Error("Network Error"));
 
     const { result } = renderHook(() => useFootprint());
@@ -30,16 +30,19 @@ describe("useFootprint", () => {
     // The entries should remain empty, error state should not be populated (history is non-critical)
     expect(result.current.entries).toEqual([]);
     expect(result.current.error).toBeNull();
-    
+
     // Assert console.error was called with the prefix
-    expect(consoleSpy).toHaveBeenCalledWith("[useFootprint] loadHistory failed:", expect.any(Error));
+    expect(consoleSpy).toHaveBeenCalledWith(
+      "[useFootprint] loadHistory failed:",
+      expect.any(Error),
+    );
 
     consoleSpy.mockRestore();
   });
 
   it("does nothing if save is called before calculate", async () => {
     const { result } = renderHook(() => useFootprint());
-    
+
     await result.current.save(); // early return branch
 
     expect(api.saveEntry).not.toHaveBeenCalled();
