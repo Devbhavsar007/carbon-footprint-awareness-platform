@@ -1,4 +1,5 @@
 import { describe, expect, it, vi } from "vitest";
+import { axe } from "vitest-axe";
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import React from "react";
@@ -11,6 +12,11 @@ const defaultInput: CarbonInput["consumption"] = {
 };
 
 describe("ConsumptionSection", () => {
+  it("has no accessibility violations", async () => {
+    const { container } = render(<ConsumptionSection input={defaultInput} onChange={() => {}} />);
+    expect(await axe(container)).toHaveNoViolations();
+  });
+
   it("calls onChange with updated values", async () => {
     const onChange = vi.fn();
     const Wrapper = () => {

@@ -1,4 +1,5 @@
 import { describe, expect, it, vi } from "vitest";
+import { axe } from "vitest-axe";
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import React from "react";
@@ -12,6 +13,11 @@ const defaultInput: CarbonInput["home"] = {
 };
 
 describe("HomeSection", () => {
+  it("has no accessibility violations", async () => {
+    const { container } = render(<HomeSection input={defaultInput} onChange={() => {}} />);
+    expect(await axe(container)).toHaveNoViolations();
+  });
+
   it("associates the household hint with its input for screen readers", () => {
     render(<HomeSection input={defaultInput} onChange={() => {}} />);
     expect(screen.getByLabelText(/people in household/i)).toHaveAccessibleDescription(

@@ -1,4 +1,5 @@
 import { describe, expect, it, vi } from "vitest";
+import { axe } from "vitest-axe";
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import React from "react";
@@ -14,6 +15,11 @@ const defaultInput: CarbonInput["transport"] = {
 };
 
 describe("TransportSection", () => {
+  it("has no accessibility violations", async () => {
+    const { container } = render(<TransportSection input={defaultInput} onChange={() => {}} />);
+    expect(await axe(container)).toHaveNoViolations();
+  });
+
   it("constrains numeric inputs to the documented bounds", () => {
     render(<TransportSection input={defaultInput} onChange={() => {}} />);
     expect(screen.getByLabelText(/car distance per week/i)).toHaveAttribute("max", "20000");
