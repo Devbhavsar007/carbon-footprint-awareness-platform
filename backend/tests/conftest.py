@@ -21,7 +21,7 @@ def client(monkeypatch):
 
     config.get_settings.cache_clear()
     deps.get_repository.cache_clear()
-    gemini._load_prompt_config.cache_clear()
+    gemini._read_prompt_config.cache_clear()
     gemini._get_gemini_client.cache_clear()
     gemini._INSIGHTS_CACHE.clear()
 
@@ -33,6 +33,6 @@ def client(monkeypatch):
 
     config.get_settings.cache_clear()
     deps.get_repository.cache_clear()
-    gemini._load_prompt_config.cache_clear()
+    gemini._read_prompt_config.cache_clear()
     gemini._get_gemini_client.cache_clear()
     gemini._INSIGHTS_CACHE.clear()

@@ -51,3 +51,13 @@ def test_entry_create_accepts_well_formed_device_id():
     result = calculate_footprint(data)
     entry = EntryCreate(device_id="dev-abc123XYZ_-", input=data, result=result)
     assert entry.device_id == "dev-abc123XYZ_-"
+
+
+def test_recommendation_category_must_be_known():
+    with pytest.raises(ValidationError):
+        from app.models import Recommendation
+        Recommendation(
+            category="crypto_mining",
+            action="Stop mining",
+            estimated_annual_savings_kg=100.0,
+        )

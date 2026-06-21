@@ -5,12 +5,18 @@ from __future__ import annotations
 from fastapi import APIRouter, Depends, Path, Query
 
 from app.deps import get_repository
-from app.models import Entry, EntryCreate
+from app.models import (
+    DEVICE_ID_MAX_LEN,
+    DEVICE_ID_MIN_LEN,
+    DEVICE_ID_PATTERN,
+    Entry,
+    EntryCreate,
+)
 from app.repository.base import EntryRepository
 
 router = APIRouter(prefix="/api/entries", tags=["entries"])
 
-_DEVICE_ID = Path(min_length=8, max_length=128, pattern=r"^[A-Za-z0-9_-]+$")
+_DEVICE_ID = Path(min_length=DEVICE_ID_MIN_LEN, max_length=DEVICE_ID_MAX_LEN, pattern=DEVICE_ID_PATTERN)
 
 
 @router.post("", response_model=Entry, status_code=201)

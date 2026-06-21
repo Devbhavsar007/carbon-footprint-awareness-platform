@@ -15,36 +15,44 @@ from pydantic import BaseModel, Field
 from app.carbon.factors import CarFuel, DietType
 
 # Generous-but-finite upper bounds keep inputs sane without rejecting real users.
-_MAX_KM_WEEK = 20_000.0
-_MAX_KWH_MONTH = 100_000.0
-_MAX_FLIGHTS = 200
-_MAX_USD_MONTH = 1_000_000.0
-_MAX_WASTE_WEEK = 1_000.0
+# These are public so the frontend sync script and route modules can import them
+# instead of hand-duplicating the values.
+MAX_KM_WEEK = 20_000.0
+MAX_KWH_MONTH = 100_000.0
+MAX_FLIGHTS = 200
+MAX_USD_MONTH = 1_000_000.0
+MAX_WASTE_WEEK = 1_000.0
+MAX_HOUSEHOLD = 50
+
+# Device-id constraints shared with routes/entries.py Path() declaration.
+DEVICE_ID_PATTERN = r"^[A-Za-z0-9_-]+$"
+DEVICE_ID_MIN_LEN = 8
+DEVICE_ID_MAX_LEN = 128
 
 
 class TransportInput(BaseModel):
     """Weekly travel habits plus yearly flight counts."""
 
-    car_km_per_week: float = Field(0, ge=0, le=_MAX_KM_WEEK)
+    car_km_per_week: float = Field(0, ge=0, le=MAX_KM_WEEK)
     car_fuel: CarFuel = CarFuel.PETROL
-    public_transit_km_per_week: float = Field(0, ge=0, le=_MAX_KM_WEEK)
-    short_haul_flights_per_year: int = Field(0, ge=0, le=_MAX_FLIGHTS)
-    long_haul_flights_per_year: int = Field(0, ge=0, le=_MAX_FLIGHTS)
+    public_transit_km_per_week: float = Field(0, ge=0, le=MAX_KM_WEEK)
+    short_haul_flights_per_year: int = Field(0, ge=0, le=MAX_FLIGHTS)
+    long_haul_flights_per_year: int = Field(0, ge=0, le=MAX_FLIGHTS)
 
 
 class HomeInput(BaseModel):
     """Monthly household energy use, shared across the household size."""
 
-    electricity_kwh_per_month: float = Field(0, ge=0, le=_MAX_KWH_MONTH)
-    natural_gas_kwh_per_month: float = Field(0, ge=0, le=_MAX_KWH_MONTH)
-    household_size: int = Field(1, ge=1, le=50)
+    electricity_kwh_per_month: float = Field(0, ge=0, le=MAX_KWH_MONTH)
+    natural_gas_kwh_per_month: float = Field(0, ge=0, le=MAX_KWH_MONTH)
+    household_size: int = Field(1, ge=1, le=MAX_HOUSEHOLD)
 
 
 class ConsumptionInput(BaseModel):
     """Consumer goods spending and landfill waste."""
 
-    goods_spend_usd_per_month: float = Field(0, ge=0, le=_MAX_USD_MONTH)
-    waste_kg_per_week: float = Field(0, ge=0, le=_MAX_WASTE_WEEK)
+    goods_spend_usd_per_month: float = Field(0, ge=0, le=MAX_USD_MONTH)
+    waste_kg_per_week: float = Field(0, ge=0, le=MAX_WASTE_WEEK)
 
 
 class CarbonInput(BaseModel):
@@ -78,7 +86,7 @@ class FootprintResult(BaseModel):
 class Recommendation(BaseModel):
     """One concrete reduction action with a quantified annual saving."""
 
-    category: str
+    category: Literal["transport", "home", "diet", "consumption"]
     action: str
     estimated_annual_savings_kg: float
 
@@ -95,7 +103,11 @@ class InsightsResponse(BaseModel):
 class EntryCreate(BaseModel):
     """Request payload to save a footprint snapshot for an anonymous device."""
 
-    device_id: str = Field(min_length=8, max_length=128, pattern=r"^[A-Za-z0-9_-]+$")
+    device_id: str = Field(
+        min_length=DEVICE_ID_MIN_LEN,
+        max_length=DEVICE_ID_MAX_LEN,
+        pattern=DEVICE_ID_PATTERN,
+    )
     input: CarbonInput
     result: FootprintResult
 

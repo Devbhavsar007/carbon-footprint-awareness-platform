@@ -151,15 +151,21 @@ def test_validate_rejects_negative_savings():
         gemini._validate_gemini_response(payload, total_annual_kg=5000.0)
 
 
-def test_validate_rejects_unknown_category():
+@pytest.mark.asyncio
+async def test_gemini_unknown_category_falls_back_to_rules(monkeypatch):
+    gemini._INSIGHTS_CACHE.clear()
     payload = {
         "summary": "Fine.",
         "recommendations": [
             {"category": "crypto_mining", "action": "Stop mining", "estimated_annual_savings_kg": 100},
         ],
     }
-    with pytest.raises(ValueError, match="Unknown category"):
-        gemini._validate_gemini_response(payload, total_annual_kg=5000.0)
+    monkeypatch.setattr("google.genai.Client", _fake_genai_client(json.dumps(payload)))
+    gemini._get_gemini_client.cache_clear()
+    data, result = _ctx()
+    resp = await gemini.generate_insights(data, result, Settings(use_gemini=True))
+    assert resp.source == "rules"
+    gemini._get_gemini_client.cache_clear()
 
 
 def test_validate_rejects_oversized_summary():

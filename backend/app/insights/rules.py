@@ -15,7 +15,7 @@ from app.carbon import factors
 from app.models import CarbonInput, FootprintResult, InsightsResponse, Recommendation
 
 # Achievable reduction shares behind each recommendation's savings estimate.
-# Deliberately conservative round figures for awareness-level guidance:
+# These are illustrative engineering estimates, not sourced figures:
 _FLIGHT_REDUCTION_SHARE = 0.5  # replace/combine flights → roughly halve aviation
 _HOME_ENERGY_REDUCTION_SHARE = 0.33  # renewable tariff + insulation → ~a third
 _CONSUMPTION_REDUCTION_SHARE = 0.25  # durable/second-hand goods, less landfill

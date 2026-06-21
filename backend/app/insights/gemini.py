@@ -28,10 +28,11 @@ import asyncio
 import hashlib
 import json
 import logging
-import threading
 import time
+import copy
 from functools import lru_cache
 from pathlib import Path
+from typing import Any, cast
 
 from cachetools import TTLCache
 
@@ -43,9 +44,6 @@ from app.models import CarbonInput, FootprintResult, InsightsResponse, Recommend
 
 logger = logging.getLogger(__name__)
 
-# Known emission categories — used to validate Gemini's output.
-_KNOWN_CATEGORIES = frozenset({"transport", "home", "diet", "consumption"})
-
 # Maximum allowed summary length from Gemini (guard against bloated output).
 _MAX_SUMMARY_LENGTH = 1000
 
@@ -54,12 +52,12 @@ _PROMPTS_DIR = Path(__file__).resolve().parent / "prompts"
 
 # TTL cache for insights responses — avoids duplicate Gemini calls when a user
 # re-submits identical data within 60 seconds.  Thread-safe via a lock.
-_INSIGHTS_CACHE: TTLCache = TTLCache(maxsize=256, ttl=60)
-_CACHE_LOCK = threading.Lock()
+_INSIGHTS_CACHE: TTLCache[str, InsightsResponse] = TTLCache(maxsize=256, ttl=60)
+_CACHE_LOCK = asyncio.Lock()
 
 
 @lru_cache
-def _load_prompt_config(version: str) -> dict:
+def _read_prompt_config(version: str) -> dict[str, Any]:
     """Load and cache the prompt configuration from a versioned YAML file.
 
     Falls back to the inline defaults if the file is missing, so the system
@@ -68,23 +66,28 @@ def _load_prompt_config(version: str) -> dict:
     path = _PROMPTS_DIR / f"{version}.yaml"
     if path.exists():
         with open(path, encoding="utf-8") as f:
-            return yaml.safe_load(f)
+            return cast(dict[str, Any], yaml.safe_load(f))
     logger.warning("Prompt config %s not found, using inline defaults", path)
     return {}
 
 
-def _get_system_instruction(config: dict) -> str:
-    return config.get(
+def _load_prompt_config(version: str) -> dict[str, Any]:
+    """Return a safe deep copy of the cached prompt configuration."""
+    return copy.deepcopy(_read_prompt_config(version))
+
+
+def _get_system_instruction(config: dict[str, Any]) -> str:
+    return cast(str, config.get(
         "system_instruction",
         "You are a concise, encouraging sustainability coach. Given a person's annual "
         "carbon footprint breakdown (kg CO2e), produce a short summary and 2-4 specific, "
         "realistic actions that target their largest emission sources. Each action must "
         "include an estimated annual saving in kg CO2e. Be practical and non-judgmental.",
-    )
+    ))
 
 
-def _get_response_schema(config: dict) -> dict:
-    return config.get("response_schema", {
+def _get_response_schema(config: dict[str, Any]) -> dict[str, Any]:
+    return cast(dict[str, Any], config.get("response_schema", copy.deepcopy({
         "type": "object",
         "properties": {
             "summary": {"type": "string"},
@@ -102,7 +105,7 @@ def _get_response_schema(config: dict) -> dict:
             },
         },
         "required": ["summary", "recommendations"],
-    })
+    })))
 
 
 def _build_prompt(data: CarbonInput, result: FootprintResult) -> str:
@@ -117,7 +120,7 @@ def _build_prompt(data: CarbonInput, result: FootprintResult) -> str:
 
 
 def _validate_gemini_response(
-    payload: dict, total_annual_kg: float
+    payload: dict[str, Any], total_annual_kg: float
 ) -> None:
     """Validate Gemini's parsed JSON output beyond structural correctness.
 
@@ -132,9 +135,6 @@ def _validate_gemini_response(
         )
 
     for rec in payload.get("recommendations", []):
-        category = rec.get("category", "")
-        if category not in _KNOWN_CATEGORIES:
-            raise ValueError(f"Unknown category from Gemini: {category!r}")
 
         savings = rec.get("estimated_annual_savings_kg", 0)
         if savings <= 0:
@@ -146,7 +146,7 @@ def _validate_gemini_response(
 
 
 @lru_cache
-def _get_gemini_client(project_id: str, region: str):
+def _get_gemini_client(project_id: str, region: str) -> Any:
     """Return a cached Gemini client (avoids re-initializing credentials per call).
 
     Imported lazily so the SDK/credentials are only required when actually used —
@@ -190,7 +190,7 @@ def _call_gemini(
 
     recommendations = [
         Recommendation(
-            category=str(r["category"]),
+            category=r["category"],
             action=str(r["action"]),
             estimated_annual_savings_kg=round(float(r["estimated_annual_savings_kg"]), 2),
         )
@@ -227,7 +227,7 @@ async def generate_insights(
 
     # ── Cache check ──────────────────────────────────────────────────
     cache_key = _cache_key(data)
-    with _CACHE_LOCK:
+    async with _CACHE_LOCK:
         cached = _INSIGHTS_CACHE.get(cache_key)
     if cached is not None:
         _log_insight(start, "cache", id_hash)
@@ -240,7 +240,7 @@ async def generate_insights(
     # ── Rules-only path ──────────────────────────────────────────────
     if not settings.use_gemini:
         resp = generate_rule_based_insights(data, result)
-        with _CACHE_LOCK:
+        async with _CACHE_LOCK:
             _INSIGHTS_CACHE[cache_key] = resp
         _log_insight(start, resp.source, id_hash)
         return resp
@@ -258,7 +258,7 @@ async def generate_insights(
         return resp
 
     # Store successful result in cache.
-    with _CACHE_LOCK:
+    async with _CACHE_LOCK:
         _INSIGHTS_CACHE[cache_key] = resp
     _log_insight(start, resp.source, id_hash)
     return resp

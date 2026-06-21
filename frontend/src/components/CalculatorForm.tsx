@@ -1,20 +1,19 @@
 import { useState } from "react";
 import { type CarbonInput, type CarFuel, type DietType, emptyInput } from "../lib/types";
+import {
+  MAX_FLIGHTS,
+  MAX_HOUSEHOLD,
+  MAX_KM_WEEK,
+  MAX_KWH_MONTH,
+  MAX_USD_MONTH,
+  MAX_WASTE_WEEK,
+} from "../lib/constants";
 import { NumberField } from "./NumberField";
 
 interface Props {
   onSubmit: (input: CarbonInput) => void;
   loading: boolean;
 }
-
-// Input ceilings mirror the backend Pydantic bounds (app/models.py) so the
-// browser blocks out-of-range values before the API would reject them.
-const MAX_KM_WEEK = 20_000;
-const MAX_KWH_MONTH = 100_000;
-const MAX_FLIGHTS = 200;
-const MAX_USD_MONTH = 1_000_000;
-const MAX_WASTE_WEEK = 1_000;
-const MAX_HOUSEHOLD = 50;
 
 const DIET_OPTIONS: { value: DietType; label: string }[] = [
   { value: "heavy_meat", label: "Heavy meat eater" },

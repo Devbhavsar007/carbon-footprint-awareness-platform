@@ -25,7 +25,8 @@ export function useFootprint() {
   const loadHistory = useCallback(async () => {
     try {
       setEntries(await api.listEntries(deviceId));
-    } catch {
+    } catch (err) {
+      console.error("[useFootprint] loadHistory failed:", err);
       // History is non-critical; fail silently rather than blocking the app.
     }
   }, [deviceId]);
@@ -35,7 +36,7 @@ export function useFootprint() {
   }, [loadHistory]);
 
   /** Calculate the footprint and fetch personalized insights for the input. */
-  const calculate = async (input: CarbonInput) => {
+  const calculate = useCallback(async (input: CarbonInput) => {
     setLoading(true);
     setError(null);
     setStatus("");
@@ -45,28 +46,30 @@ export function useFootprint() {
       setInsights(ins);
       setLastInput(input);
       setStatus("Your footprint results and personalized insights are ready below.");
-    } catch {
+    } catch (err) {
+      console.error("[useFootprint] calculate failed:", err);
       setError("Something went wrong calculating your footprint. Please try again.");
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
   /** Persist the latest result to the device's history and refresh it. */
-  const save = async () => {
-    if (!result || !lastInput) return;
+  const save = useCallback(async () => {
+    if (!lastInput || !result) return;
     setSaving(true);
     setError(null);
     try {
       await api.saveEntry(deviceId, lastInput, result);
       await loadHistory();
       setStatus("Entry saved to your history.");
-    } catch {
+    } catch (err) {
+      console.error("[useFootprint] save failed:", err);
       setError("Could not save this entry. Please try again.");
     } finally {
       setSaving(false);
     }
-  };
+  }, [deviceId, lastInput, result, loadHistory]);
 
   return { result, insights, entries, loading, saving, error, status, calculate, save };
 }
