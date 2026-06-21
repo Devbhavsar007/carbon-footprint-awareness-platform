@@ -6,9 +6,45 @@ to [Semantic Versioning](https://semver.org/).
 
 ## [1.4.0] - 2026-06-21
 
+### Added
+
+- **CalculatorForm decomposition**: Extracted the monolithic calculator form
+  into three focused sub-components — `TransportSection`, `HomeSection`, and
+  `ConsumptionSection` — each owning its own fieldset, validation, and
+  `onChange` contract. `CalculatorForm` is now a thin orchestrator.
+- **Per-section test coverage**: Added dedicated test files for
+  `TransportSection`, `HomeSection`, `ConsumptionSection`, and
+  `CalculatorForm`, each with axe accessibility assertions. All four sections
+  are verified for both correct `onChange` dispatch and WCAG AA compliance.
+- **`useFootprint.test.tsx`**: New hook-level test file exercising the
+  `loadHistory` error path (silent catch) and the early-return branch when
+  `save()` is called before `calculate()`. Both tests properly `await` the
+  mount-time effect to avoid React `act()` warnings.
+- **SVG bar chart**: Replaced the inline-style `width` on the breakdown bar
+  with an `<svg><rect width={…}>` element. SVG presentation attributes are
+  not governed by CSP `style-src`, which allowed removing `'unsafe-inline'`
+  from the Content-Security-Policy header entirely.
+- **Security response headers**: Added `Strict-Transport-Security:
+  max-age=63072000; includeSubDomains` and `Cross-Origin-Opener-Policy:
+  same-origin` to the hardening middleware.
+- **mypy type stubs**: Added `types-PyYAML` and `types-cachetools` to
+  `requirements-dev.txt` so `mypy app` passes cleanly without ignoring
+  untyped third-party imports.
+- **Typed Gemini client**: `_get_gemini_client` now returns
+  `google.genai.Client` (via a `TYPE_CHECKING`-guarded import) instead of
+  `Any`, removing the `# noqa: ANN401` suppression.
+- **100% coverage lock**: Both backend (`--cov-fail-under=100` in
+  `pyproject.toml`) and frontend (`thresholds: 100` in `vite.config.ts`)
+  coverage gates are permanently raised to 100%.
+
 ### Security
 
-- **Dependency bump**: Upgraded `fastapi` to `0.138.0` and explicitly pinned `starlette` to `1.3.1` to remediate multiple CVEs (including CVE-2025-62727: Range-header quadratic-time DoS against FileResponse).
+- **Backend dependency bump**: Upgraded `fastapi` to `0.138.0` and explicitly
+  pinned `starlette` to `1.3.1` to remediate multiple CVEs (including
+  CVE-2025-62727: Range-header quadratic-time DoS against FileResponse).
+- **Dev dependency bump**: Pinned `pytest==9.1.1`, `pytest-cov==7.1.0`, and
+  `pytest-asyncio==1.4.0` to remediate CVE-2025-71176 (insecure
+  `/tmp/pytest-of-{user}` directory handling on UNIX).
 
 ## [1.3.0] - 2026-06-12
 
