@@ -24,7 +24,14 @@ export default defineConfig({
     coverage: {
       provider: "v8",
       include: ["src/**/*.{ts,tsx}"],
-      exclude: ["src/main.tsx", "src/test/**", "src/**/*.d.ts", "src/**/*.test.*", "e2e/**", "src/lib/generated-types.ts"],
+      exclude: [
+        "src/main.tsx",
+        "src/test/**",
+        "src/**/*.d.ts",
+        "src/**/*.test.*",
+        "e2e/**",
+        "src/lib/generated-types.ts",
+      ],
       // Hard gates: CI fails if coverage regresses below these thresholds.
       thresholds: {
         statements: 90,

@@ -24,6 +24,7 @@ try {
 console.log("Generating TypeScript types...");
 try {
   execSync(`npx -y openapi-typescript openapi.json -o ${outputFile}`, { stdio: "inherit" });
+  execSync("npx -y prettier --write " + outputFile, { stdio: "inherit" });
 } catch (e) {
   process.exit(1);
 }

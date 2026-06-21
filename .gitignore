@@ -12,6 +12,8 @@ htmlcov/
 node_modules/
 frontend/dist/
 frontend/coverage/
+frontend/test-results/
+frontend/openapi.json
 coverage/
 dist/
 *.log
