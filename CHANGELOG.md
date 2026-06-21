@@ -4,6 +4,12 @@ All notable changes to this project are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and the project adheres
 to [Semantic Versioning](https://semver.org/).
 
+## [1.4.0] - 2026-06-21
+
+### Security
+
+- **Dependency bump**: Upgraded `fastapi` to `0.138.0` and explicitly pinned `starlette` to `1.3.1` to remediate multiple CVEs (including CVE-2025-62727: Range-header quadratic-time DoS against FileResponse).
+
 ## [1.3.0] - 2026-06-12
 
 ### Added
