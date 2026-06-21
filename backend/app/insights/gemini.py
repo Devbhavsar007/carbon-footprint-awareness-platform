@@ -25,18 +25,17 @@ Changes in v1.3:
 from __future__ import annotations
 
 import asyncio
+import copy
 import hashlib
 import json
 import logging
 import time
-import copy
 from functools import lru_cache
 from pathlib import Path
 from typing import Any, cast
 
-from cachetools import TTLCache
-
 import yaml
+from cachetools import TTLCache
 
 from app.config import Settings
 from app.insights.rules import generate_rule_based_insights
@@ -77,35 +76,46 @@ def _load_prompt_config(version: str) -> dict[str, Any]:
 
 
 def _get_system_instruction(config: dict[str, Any]) -> str:
-    return cast(str, config.get(
-        "system_instruction",
-        "You are a concise, encouraging sustainability coach. Given a person's annual "
-        "carbon footprint breakdown (kg CO2e), produce a short summary and 2-4 specific, "
-        "realistic actions that target their largest emission sources. Each action must "
-        "include an estimated annual saving in kg CO2e. Be practical and non-judgmental.",
-    ))
+    return cast(
+        str,
+        config.get(
+            "system_instruction",
+            "You are a concise, encouraging sustainability coach. Given a person's annual "
+            "carbon footprint breakdown (kg CO2e), produce a short summary and 2-4 specific, "
+            "realistic actions that target their largest emission sources. Each action must "
+            "include an estimated annual saving in kg CO2e. Be practical and non-judgmental.",
+        ),
+    )
 
 
 def _get_response_schema(config: dict[str, Any]) -> dict[str, Any]:
-    return cast(dict[str, Any], config.get("response_schema", copy.deepcopy({
-        "type": "object",
-        "properties": {
-            "summary": {"type": "string"},
-            "recommendations": {
-                "type": "array",
-                "items": {
+    return cast(
+        dict[str, Any],
+        config.get(
+            "response_schema",
+            copy.deepcopy(
+                {
                     "type": "object",
                     "properties": {
-                        "category": {"type": "string"},
-                        "action": {"type": "string"},
-                        "estimated_annual_savings_kg": {"type": "number"},
+                        "summary": {"type": "string"},
+                        "recommendations": {
+                            "type": "array",
+                            "items": {
+                                "type": "object",
+                                "properties": {
+                                    "category": {"type": "string"},
+                                    "action": {"type": "string"},
+                                    "estimated_annual_savings_kg": {"type": "number"},
+                                },
+                                "required": ["category", "action", "estimated_annual_savings_kg"],
+                            },
+                        },
                     },
-                    "required": ["category", "action", "estimated_annual_savings_kg"],
-                },
-            },
-        },
-        "required": ["summary", "recommendations"],
-    })))
+                    "required": ["summary", "recommendations"],
+                }
+            ),
+        ),
+    )
 
 
 def _build_prompt(data: CarbonInput, result: FootprintResult) -> str:
@@ -119,9 +129,7 @@ def _build_prompt(data: CarbonInput, result: FootprintResult) -> str:
     )
 
 
-def _validate_gemini_response(
-    payload: dict[str, Any], total_annual_kg: float
-) -> None:
+def _validate_gemini_response(payload: dict[str, Any], total_annual_kg: float) -> None:
     """Validate Gemini's parsed JSON output beyond structural correctness.
 
     Raises ValueError if any recommendation has impossible savings, an unknown
@@ -135,7 +143,6 @@ def _validate_gemini_response(
         )
 
     for rec in payload.get("recommendations", []):
-
         savings = rec.get("estimated_annual_savings_kg", 0)
         if savings <= 0:
             raise ValueError(f"Non-positive savings from Gemini: {savings}")
@@ -146,7 +153,7 @@ def _validate_gemini_response(
 
 
 @lru_cache
-def _get_gemini_client(project_id: str, region: str) -> Any:
+def _get_gemini_client(project_id: str, region: str) -> Any:  # noqa: ANN401
     """Return a cached Gemini client (avoids re-initializing credentials per call).
 
     Imported lazily so the SDK/credentials are only required when actually used —
@@ -211,7 +218,9 @@ def _cache_key(data: CarbonInput) -> str:
 
 
 async def generate_insights(
-    data: CarbonInput, result: FootprintResult, settings: Settings,
+    data: CarbonInput,
+    result: FootprintResult,
+    settings: Settings,
     device_id: str = "",
 ) -> InsightsResponse:
     """Return personalized insights, preferring Gemini and falling back to rules.

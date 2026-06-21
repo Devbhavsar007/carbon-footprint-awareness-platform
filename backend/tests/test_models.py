@@ -56,6 +56,7 @@ def test_entry_create_accepts_well_formed_device_id():
 def test_recommendation_category_must_be_known():
     with pytest.raises(ValidationError):
         from app.models import Recommendation
+
         Recommendation(
             category="crypto_mining",
             action="Stop mining",

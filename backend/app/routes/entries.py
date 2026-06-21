@@ -16,11 +16,15 @@ from app.repository.base import EntryRepository
 
 router = APIRouter(prefix="/api/entries", tags=["entries"])
 
-_DEVICE_ID = Path(min_length=DEVICE_ID_MIN_LEN, max_length=DEVICE_ID_MAX_LEN, pattern=DEVICE_ID_PATTERN)
+_DEVICE_ID = Path(
+    min_length=DEVICE_ID_MIN_LEN, max_length=DEVICE_ID_MAX_LEN, pattern=DEVICE_ID_PATTERN
+)
 
 
 @router.post("", response_model=Entry, status_code=201)
-async def create_entry(payload: EntryCreate, repo: EntryRepository = Depends(get_repository)) -> Entry:
+async def create_entry(
+    payload: EntryCreate, repo: EntryRepository = Depends(get_repository)
+) -> Entry:
     """Persist a footprint entry for the (anonymous) device."""
     return await repo.async_add(payload.device_id, payload.input, payload.result)
 

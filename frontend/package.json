@@ -15,7 +15,7 @@
     "test:coverage": "vitest run --coverage",
     "test:watch": "vitest",
     "test:e2e": "playwright test",
-    "types:sync": "bash scripts/sync-types.sh"
+    "types:sync": "node scripts/sync-types.mjs"
   },
   "dependencies": {
     "react": "18.3.1",

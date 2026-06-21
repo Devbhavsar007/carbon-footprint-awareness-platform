@@ -1,68 +1,30 @@
-// Shared types mirroring the backend Pydantic schema (app/models.py).
+/**
+ * Public type API — re-exports generated OpenAPI types with frontend-friendly
+ * names. CarbonInput uses Required<> because the frontend always supplies all
+ * sections (transport, home, consumption), even though the backend marks them
+ * optional (with server-side defaults).
+ *
+ * If the backend schema changes, run `npm run types:sync` to regenerate
+ * generated-types.ts. A structural mismatch will surface here as a TS error.
+ */
+import type { components } from "./generated-types";
 
-export type CarFuel = "petrol" | "diesel" | "hybrid" | "electric";
+export type CarFuel = components["schemas"]["CarFuel"];
+export type DietType = components["schemas"]["DietType"];
 
-export type DietType =
-  | "heavy_meat"
-  | "medium_meat"
-  | "low_meat"
-  | "pescatarian"
-  | "vegetarian"
-  | "vegan";
+/**
+ * The frontend always provides all sections. The generated type marks
+ * transport/home/consumption as optional because Pydantic fills defaults,
+ * but the UI always sends complete objects. Required<> bridges this gap.
+ */
+export type CarbonInput = Required<components["schemas"]["CarbonInput-Input"]>;
 
-export interface CarbonInput {
-  transport: {
-    car_km_per_week: number;
-    car_fuel: CarFuel;
-    public_transit_km_per_week: number;
-    short_haul_flights_per_year: number;
-    long_haul_flights_per_year: number;
-  };
-  home: {
-    electricity_kwh_per_month: number;
-    natural_gas_kwh_per_month: number;
-    household_size: number;
-  };
-  diet: DietType;
-  consumption: {
-    goods_spend_usd_per_month: number;
-    waste_kg_per_week: number;
-  };
-}
-
-export interface Comparison {
-  global_average_annual_kg: number;
-  sustainable_target_annual_kg: number;
-  ratio_to_global_average: number;
-  ratio_to_sustainable_target: number;
-}
-
-export interface FootprintResult {
-  breakdown_kg: Record<string, number>;
-  total_annual_kg: number;
-  total_annual_tonnes: number;
-  comparison: Comparison;
-}
-
-export interface Recommendation {
-  category: string;
-  action: string;
-  estimated_annual_savings_kg: number;
-}
-
-export interface InsightsResponse {
-  summary: string;
-  recommendations: Recommendation[];
-  source: "gemini" | "rules" | "cache";
-}
-
-export interface Entry {
-  id: string;
-  created_at: string;
-  device_id: string;
-  input: CarbonInput;
-  result: FootprintResult;
-}
+export type Comparison = components["schemas"]["Comparison"];
+export type FootprintResult = components["schemas"]["FootprintResult"];
+export type Recommendation = components["schemas"]["Recommendation"];
+export type InsightsResponse = components["schemas"]["InsightsResponse"];
+export type Entry = components["schemas"]["Entry"];
+export type EntryCreate = components["schemas"]["EntryCreate"];
 
 /** A fresh, all-zero input with sensible defaults (average diet, petrol car). */
 export const emptyInput = (): CarbonInput => ({

@@ -122,7 +122,7 @@ jobs:
       - name: Check for type drift
         working-directory: frontend
         run: |
-          if git diff --exit-code src/lib/types.ts; then
+          if git diff --exit-code src/lib/generated-types.ts; then
             echo "✅ Types are in sync with OpenAPI schema."
           else
             echo "❌ Type drift detected! Run 'npm run types:sync' and commit."

@@ -9,7 +9,7 @@ import tseslint from "typescript-eslint";
 export default tseslint.config(
   // Type declaration files merge external library types and legitimately use
   // patterns (empty interfaces, `any`) the lint rules would reject.
-  { ignores: ["dist", "coverage", "node_modules", "**/*.d.ts"] },
+  { ignores: ["dist", "coverage", "node_modules", "scripts", "**/*.d.ts"] },
   js.configs.recommended,
   ...tseslint.configs.recommended,
   {

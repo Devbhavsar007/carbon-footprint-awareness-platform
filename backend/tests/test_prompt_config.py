@@ -13,6 +13,7 @@ from app.models import CarbonInput, ConsumptionInput, HomeInput, TransportInput
 @pytest.fixture(autouse=True)
 def _clear_prompt_cache():
     from app.insights.gemini import _read_prompt_config
+
     _read_prompt_config.cache_clear()
     yield
     _read_prompt_config.cache_clear()
@@ -36,15 +37,15 @@ def test_missing_prompt_version_returns_empty_dict_gracefully():
 def test_prompt_config_is_cached_and_immutable():
     first = _load_prompt_config("v1")
     second = _load_prompt_config("v1")
-    
+
     # It's a deep copy, so the objects are distinct.
     assert first is not second
     assert first == second
-    
+
     # Mutating one does not corrupt the next call.
     first["system_instruction"] = "corrupted"
     third = _load_prompt_config("v1")
-    
+
     assert third["system_instruction"] != "corrupted"
     assert second == third
 
