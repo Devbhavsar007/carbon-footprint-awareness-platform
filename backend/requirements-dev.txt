@@ -6,7 +6,7 @@ pytest==9.1.1
 pytest-cov==7.1.0
 pytest-asyncio==1.4.0
 httpx==0.28.1
-ruff==0.8.6
+ruff==0.15.20
 mypy==1.14.1
 # Type stubs for runtime deps that don't ship a py.typed marker — required for
 # `mypy app` (strict) to pass cleanly instead of erroring on untyped imports.
